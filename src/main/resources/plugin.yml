@@ -1,0 +1,22 @@
+name: ServerChan
+author: Li Keqing<me@kaze.ai>
+version: 1.0
+api-version: 1.17
+main: ai.kaze.ServerChan.ServerChanPlugin
+commands:
+  bind:
+    description: 绑定QQ号
+    usage: /<command> QQ号
+    permission: sc.def
+  unbind:
+    description: 解绑QQ号
+    usage: /<command>
+    permission: sc.def
+  qqsay:
+    description: 发送消息到QQ群
+    usage: /<command> 消息
+    permission: sc.def
+permissions:
+  sc.def:
+    description: 默认权限
+    default: not op
