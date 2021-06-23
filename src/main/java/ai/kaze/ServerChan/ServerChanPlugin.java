@@ -1,15 +1,13 @@
 package ai.kaze.ServerChan;
 
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.logging.Logger;
 
 public class ServerChanPlugin extends JavaPlugin {
     final Logger logger = Logger.getLogger("Minecraft");
-    QQBotServer server;
+    private QQBotServer server;
 
     @Override
     public void onLoad() {

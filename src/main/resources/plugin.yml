@@ -12,6 +12,11 @@ commands:
     description: 解绑QQ号
     usage: /<command>
     permission: sc.def
+  forceunbind:
+    description: 强制解除绑定QQ号
+    usage: /<command> 玩家名
+    permission: sc.op
+    permission-message: 只有OP可以执行这条命令
   qqsay:
     description: 发送消息到QQ群
     usage: /<command> 消息
@@ -20,3 +25,6 @@ permissions:
   sc.def:
     description: 默认权限
     default: not op
+  sc.op:
+    description: OP
+    default: op
