@@ -177,6 +177,9 @@ public class QQCommandDispatcher {
         stringBuilder.append("    /bind x        使用验证码x与游戏内角色绑定\n");
         stringBuilder.append("    /unbind        撤销绑定\n");
         stringBuilder.append("    /say           发送信息到游戏内");
+        if (isOp(sender)) {
+            stringBuilder.append("\n    /opcmd x         发送管理指令至游戏端");
+        }
         plugin.qqBotServer.sendMessage(stringBuilder.toString());
     }
 
