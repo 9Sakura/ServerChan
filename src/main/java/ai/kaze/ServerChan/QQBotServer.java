@@ -33,12 +33,24 @@ public class QQBotServer extends WebSocketServer {
         JsonElement json = new Gson().fromJson(s, JsonElement.class);
         try {
             JsonObject jsonObject = json.getAsJsonObject();
-            int groupId = jsonObject.get("group_id").getAsInt();
+            JsonElement groupIdElement = jsonObject.get("group_id");
+            if (groupIdElement == null) {
+                return;
+            }
+            int groupId = groupIdElement.getAsInt();
             if (plugin.getConfig().getInt("group", -1) != groupId) {
                 return;
             }
-            String user = ((Integer) jsonObject.get("user_id").getAsInt()).toString();
-            String message = jsonObject.get("message").getAsString();
+            JsonElement userIdElement = jsonObject.get("user_id");
+            if (userIdElement == null) {
+                return;
+            }
+            String user = ((Integer) userIdElement.getAsInt()).toString();
+            JsonElement messageElement = jsonObject.get("message");
+            if (messageElement == null) {
+                return;
+            }
+            String message = messageElement.getAsString();
             List<String> splits = Arrays.stream(message.split(" ")).toList();
             String command = splits.remove(0);
             if (command.startsWith("/")) {
