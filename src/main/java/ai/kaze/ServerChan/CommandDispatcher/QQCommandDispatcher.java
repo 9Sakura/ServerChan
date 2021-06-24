@@ -46,6 +46,7 @@ public class QQCommandDispatcher {
             double[] tps = (double[]) recentTps.get(server);
             if (tps.length < 3) {
                 plugin.qqBotServer.sendMessage("无法获取当前服务器的 TPS 呢……");
+                return;
             }
             plugin.qqBotServer.sendMessage(String.format("服务器1分钟、5分钟和15分钟的平均TPS分别为：%.2f %.2f %.2f", tps[0], tps[1], tps[2]));
         } catch (NoSuchFieldException | IllegalAccessException e) {
