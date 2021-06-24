@@ -19,8 +19,12 @@ public class MinecraftCommandDispatcher {
     public void onQQSay(CommandSender sender, String[] payloads) {
         if (sender instanceof Player player) {
             UUID uuid = player.getUniqueId();
-            String qq = (String) plugin.persistDatabase.get(uuid, "0");
-            plugin.qqBotServer.sendMessage(String.format("[CQ:at,qq=%s] 在游戏中说：%s", qq, String.join(" ", payloads)));
+            String qq = (String) plugin.persistDatabase.get(uuid, "");
+            if (qq.isEmpty()) {
+                sender.sendMessage("[服务器娘] 您似乎没有绑定 QQ 号呢……快使用 /bind 来绑定吧！");
+            } else {
+                plugin.qqBotServer.sendMessage(String.format("[CQ:at,qq=%s] 在游戏中说：%s", qq, String.join(" ", payloads)));
+            }
         } else if (sender instanceof ConsoleCommandSender) {
             plugin.qqBotServer.sendMessage("服务器娘说：" + String.join(" ", payloads));
         }
@@ -56,17 +60,31 @@ public class MinecraftCommandDispatcher {
                 Map<String, String> value = (Map<String, String>) plugin.temporaryDatabase.get(uuid, null);
                 if (value != null) {
                     String deadline = value.get("deadline");
-                    // FIXME: 比较 ddl 剩余时间，比较 QQ 号
+                    long ddl = Long.parseLong(deadline, 0);
+                    long second = (ddl - System.currentTimeMillis()) / 1000;
+                    String oldQQ = value.get("qq");
+                    String luckyString = value.get("lucky");
+                    if (!qq.equals(oldQQ)) {
+                        player.sendMessage(String.format("[服务器娘] 您已经将欲绑定的 QQ 号变更至 %s", qq));
+                        value.put("qq", oldQQ);
+                        ddl = System.currentTimeMillis() + 1000 * 60 * 5;
+                        value.put("deadline", ((Long) ddl).toString());
+                        plugin.temporaryDatabase.set(uuid, value);
+                        player.sendMessage(String.format("[服务器娘] 您正在请求绑定 QQ 号，请在群中发送 /bind %s 信息来完成绑定，该信息五分钟内有效。", luckyString));
+                        return;
+                    }
+                    player.sendMessage(String.format("[服务器娘] 您的上一个绑定操作尚未完成，请在群中发送 /bind %s 信息来完成绑定，该信息 %d 秒内有效。", luckyString, second));
+                    return;
                 }
             }
             String luckyString = getRandomString();
             long ddl = System.currentTimeMillis() + 1000 * 60 * 5;
             Map<String, String> value = new HashMap<>();
-            value.put("qq", payloads[1]);
+            value.put("qq", qq);
             value.put("lucky", luckyString);
             value.put("deadline", ((Long) ddl).toString());
             plugin.temporaryDatabase.set(uuid, value);
-            player.sendMessage(String.format("[服务器娘] 您正在请求绑定 QQ 号，请在群中发送 /bind %s 信息来完成绑定，该信息五分钟内有效。", luckyString));
+            player.sendMessage(String.format("[服务器娘] 您正在请求绑定 QQ 号 %s，请在群中发送 /bind %s 信息来完成绑定，该信息五分钟内有效。", qq, luckyString));
         }
     }
 

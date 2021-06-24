@@ -3,10 +3,7 @@ package ai.kaze.ServerChan.Database;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
 public class TemporaryDatabase implements Database {
@@ -54,5 +51,18 @@ public class TemporaryDatabase implements Database {
             }
         });
         uuids.forEach(uuid -> map.remove(uuid));
+    }
+
+    public Map<UUID, String> getLuckyPair(String qq) {
+        Map<UUID, String> result = new HashMap<>();
+        map.forEach((o, o2) -> {
+            if (o instanceof UUID uuid && o2 instanceof Map map) {
+                String q = (String) map.get("qq");
+                if (q.equals(qq)) {
+                    result.put(uuid, (String) map.get("lucky"));
+                }
+            }
+        });
+        return result;
     }
 }

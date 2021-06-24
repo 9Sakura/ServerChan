@@ -9,8 +9,7 @@ import org.bukkit.permissions.ServerOperator;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -32,6 +31,10 @@ public class QQCommandDispatcher {
     @CommandHandler(command = "say")
     public void onSay(String sender, String[] payloads) {
         OfflinePlayer[] players = plugin.persistDatabase.getPlayersFromQQ(sender);
+        if (players.length == 0) {
+            plugin.qqBotServer.sendMessage(String.format("[CQ:at,qq=%s] 还没有绑定哦，无法发送信息哦！", sender));
+            return;
+        }
         Bukkit.getServer().broadcastMessage(String.format("%s 说：%s", Arrays.stream(players).map(OfflinePlayer::getName).collect(Collectors.joining(", ")), String.join(" ", payloads)));
     }
 
@@ -71,7 +74,32 @@ public class QQCommandDispatcher {
 
     @CommandHandler(command = "bind")
     public void onBind(String sender, String[] payloads) {
-        // FIXME: /bind 随机码
+        plugin.temporaryDatabase.checkExpired();
+        if (payloads.length == 0) {
+            plugin.qqBotServer.sendMessage(String.format("[CQ:at,qq=%s] 请使用 /bind [验证码] 来完成绑定哦！\n验证码需要在游戏内获得。", sender));
+            return;
+        }
+        Map<UUID, String> lucky = plugin.temporaryDatabase.getLuckyPair(sender);
+        if (lucky.size() == 0) {
+            plugin.qqBotServer.sendMessage(String.format("[CQ:at,qq=%s] 还没有在游戏中申请绑定哦！", sender));
+            return;
+        }
+
+        List<String> names = new ArrayList<>();
+
+        lucky.forEach((uuid, s) -> {
+            if (s.equals(payloads[0])) {
+                plugin.persistDatabase.set(uuid, sender);
+                Player player = Bukkit.getPlayer(uuid);
+                if (player != null) {
+                    player.sendMessage(String.format("[服务器娘] 您与 %s 绑定成功了哦～", sender));
+                }
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+                names.add(offlinePlayer.getName());
+            }
+        });
+
+        plugin.qqBotServer.sendMessage(String.format("[CQ:at,qq=%s] 您与 %s 绑定成功了哦～", sender, String.join("，", names)));
     }
 
     @CommandHandler(command = "unbind")
