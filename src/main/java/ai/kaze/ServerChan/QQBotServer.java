@@ -33,31 +33,19 @@ public class QQBotServer extends WebSocketServer {
         JsonElement json = new Gson().fromJson(s, JsonElement.class);
         try {
             JsonObject jsonObject = json.getAsJsonObject();
-            JsonElement groupIdElement = jsonObject.get("group_id");
-            if (groupIdElement == null) {
-                return;
-            }
-            int groupId = groupIdElement.getAsInt();
+            int groupId = jsonObject.get("group_id").getAsInt();
             if (plugin.getConfig().getInt("group", -1) != groupId) {
                 return;
             }
-            JsonElement userIdElement = jsonObject.get("user_id");
-            if (userIdElement == null) {
-                return;
-            }
-            String user = ((Integer) userIdElement.getAsInt()).toString();
-            JsonElement messageElement = jsonObject.get("message");
-            if (messageElement == null) {
-                return;
-            }
-            String message = messageElement.getAsString();
+            String user = ((Integer) jsonObject.get("user_id").getAsInt()).toString();
+            String message = jsonObject.get("message").getAsString();
             List<String> splits = Arrays.stream(message.split(" ")).toList();
             String command = splits.remove(0);
             if (command.startsWith("/")) {
                 command = command.substring(1);
                 plugin.qqCommandDispatcher.dispatchCommand(user, command, (String[]) splits.toArray());
             }
-        } catch (IllegalStateException | IndexOutOfBoundsException | UnsupportedOperationException ignored) {
+        } catch (NullPointerException | IllegalStateException | IndexOutOfBoundsException | UnsupportedOperationException ignored) {
 
         }
     }
