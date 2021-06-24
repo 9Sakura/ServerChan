@@ -6,7 +6,7 @@ main: ai.kaze.ServerChan.ServerChanPlugin
 commands:
   bind:
     description: 绑定QQ号
-    usage: /<command> QQ号
+    usage: /<command> [QQ号/cancel]
     permission: sc.def
   unbind:
     description: 解绑QQ号
@@ -14,7 +14,7 @@ commands:
     permission: sc.def
   forceunbind:
     description: 强制解除绑定QQ号
-    usage: /<command> 玩家名
+    usage: /<command> 玩家名/QQ号
     permission: sc.op
     permission-message: 只有OP可以执行这条命令
   qqsay:
