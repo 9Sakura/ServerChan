@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 public class PersistDatabase implements Database {
-    ServerChanPlugin plugin;
+    public ServerChanPlugin plugin;
     DB db;
     ConcurrentMap<UUID, String> map;
 
@@ -56,6 +56,6 @@ public class PersistDatabase implements Database {
                 players.addAll(Arrays.stream(offlinePlayers).filter(player -> player.getUniqueId().equals(uuid)).collect(Collectors.toList()));
             }
         });
-        return (OfflinePlayer[]) players.toArray();
+        return players.toArray(OfflinePlayer[]::new);
     }
 }

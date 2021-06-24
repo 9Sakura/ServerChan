@@ -10,10 +10,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 public class ServerChanPlugin extends JavaPlugin {
-    final Logger logger = Logger.getLogger("Minecraft");
     final QQCommandDispatcher qqCommandDispatcher = new QQCommandDispatcher();
     final MinecraftCommandDispatcher minecraftCommandDispatcher = new MinecraftCommandDispatcher();
     final public PersistDatabase persistDatabase = new PersistDatabase();
@@ -27,6 +25,7 @@ public class ServerChanPlugin extends JavaPlugin {
         saveDefaultConfig();
         qqCommandDispatcher.plugin = this;
         minecraftCommandDispatcher.plugin = this;
+        persistDatabase.plugin = this;
     }
 
     @Override
@@ -36,13 +35,16 @@ public class ServerChanPlugin extends JavaPlugin {
             try {
                 qqBotServer.stop();
             } catch (IOException | InterruptedException e) {
-                logger.severe(e.getMessage());
+                getLogger().severe(e.getMessage());
                 return;
             }
         }
         qqBotServer = new QQBotServer(getConfig().getInt("port", 443));
         qqBotServer.plugin = this;
         qqBotServer.start();
+
+        persistDatabase.open();
+        temporaryDatabase.open();
     }
 
     @Override
@@ -53,9 +55,12 @@ public class ServerChanPlugin extends JavaPlugin {
                 qqBotServer.stop();
                 qqBotServer = null;
             } catch (IOException | InterruptedException e) {
-                logger.severe(e.getMessage());
+                getLogger().severe(e.getMessage());
             }
         }
+
+        persistDatabase.close();
+        temporaryDatabase.close();
     }
 
     @Override

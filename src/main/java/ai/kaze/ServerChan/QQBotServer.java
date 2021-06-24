@@ -9,7 +9,6 @@ import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
 import java.util.Arrays;
-import java.util.List;
 
 public class QQBotServer extends WebSocketServer {
     ServerChanPlugin plugin;
@@ -20,12 +19,12 @@ public class QQBotServer extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
-        plugin.logger.info("WebSocket 客户端已连接");
+        plugin.getLogger().info("WebSocket 客户端已连接");
     }
 
     @Override
     public void onClose(WebSocket webSocket, int i, String s, boolean b) {
-        plugin.logger.info("WebSocket 客户端已关闭");
+        plugin.getLogger().info("WebSocket 客户端已关闭");
     }
 
     @Override
@@ -39,11 +38,15 @@ public class QQBotServer extends WebSocketServer {
             }
             String user = ((Integer) jsonObject.get("user_id").getAsInt()).toString();
             String message = jsonObject.get("message").getAsString();
-            List<String> splits = Arrays.stream(message.split(" ")).toList();
-            String command = splits.remove(0);
+            String[] splits = Arrays.stream(message.split(" ")).toArray(String[]::new);
+            if (splits.length == 0) {
+                return;
+            }
+            String command = splits[0];
+            splits = Arrays.stream(splits).skip(1).toArray(String[]::new);
             if (command.startsWith("/")) {
                 command = command.substring(1);
-                plugin.qqCommandDispatcher.dispatchCommand(user, command, (String[]) splits.toArray());
+                plugin.qqCommandDispatcher.dispatchCommand(user, command, splits);
             }
         } catch (NullPointerException | IllegalStateException | IndexOutOfBoundsException | UnsupportedOperationException ignored) {
 
@@ -63,11 +66,11 @@ public class QQBotServer extends WebSocketServer {
 
     @Override
     public void onError(WebSocket webSocket, Exception e) {
-        plugin.logger.severe("WebSocket 客户端遇到错误：" + e.getMessage());
+        plugin.getLogger().severe("WebSocket 客户端遇到错误：" + e.getMessage());
     }
 
     @Override
     public void onStart() {
-        plugin.logger.info("WebSocket 服务器已启动");
+        plugin.getLogger().info("WebSocket 服务器已启动");
     }
 }
