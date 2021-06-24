@@ -41,7 +41,10 @@ public class QQBotServer extends WebSocketServer {
             String message = jsonObject.get("message").getAsString();
             List<String> splits = Arrays.stream(message.split(" ")).toList();
             String command = splits.remove(0);
-            plugin.qqCommandDispatcher.dispatchCommand(user, command, (String[]) splits.toArray());
+            if (command.startsWith("/")) {
+                command = command.substring(1);
+                plugin.qqCommandDispatcher.dispatchCommand(user, command, (String[]) splits.toArray());
+            }
         } catch (IllegalStateException | IndexOutOfBoundsException | UnsupportedOperationException ignored) {
 
         }
